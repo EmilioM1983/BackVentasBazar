@@ -134,7 +134,7 @@ public class ProductService implements IProductService {
                 productToUpdate.get().setBrand(product.getBrand());
                 productToUpdate.get().setCost(product.getCost());
                 productToUpdate.get().setStockAvailable(product.getStockAvailable());
-                productToUpdate.get().setSale(product.getSale());
+                productToUpdate.get().setListSale(product.getListSale());
 
                 Product productUp = productDao.save(productToUpdate.get());
 
