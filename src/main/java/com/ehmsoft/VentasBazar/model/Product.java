@@ -5,8 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -24,6 +25,6 @@ public class Product {
     private String brand;
     private Double cost;
     private Double stockAvailable;
-    @ManyToOne
-    private Sale sale;
+    @OneToMany(mappedBy = "product")
+    private List<Sale> sale;
 }

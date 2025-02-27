@@ -27,7 +27,7 @@ public interface IProductService {
      * Save a product
      * @return 
      */
-    public ResponseEntity<ProductResponseRest> saveProduct();
+    public ResponseEntity<ProductResponseRest> saveProduct(Product product);
     
     /**
      * Update a product

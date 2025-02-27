@@ -3,7 +3,7 @@ package com.ehmsoft.VentasBazar.service;
 import com.ehmsoft.VentasBazar.dao.IClientDao;
 import com.ehmsoft.VentasBazar.model.Client;
 import com.ehmsoft.VentasBazar.responseDto.ClientResponseRest;
-import jakarta.transaction.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Client Service Implementation 
@@ -22,8 +23,12 @@ public class ClientService implements IClientService{
     @Autowired
     private IClientDao clientDao;
     
+    /**
+     * Search all client
+     * @return 
+     */
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<ClientResponseRest> searchClient() {
         //Declaro una variable del tipo ClientResponseRest
         ClientResponseRest response = new ClientResponseRest();
@@ -50,7 +55,13 @@ public class ClientService implements IClientService{
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * Search a client by id
+     * @param id
+     * @return 
+     */
     @Override
+    @Transactional (readOnly = true)
     public ResponseEntity<ClientResponseRest> searchClientById(Long id) {
         //Declaro una variable del tipo ClientResponseRest
         ClientResponseRest response = new ClientResponseRest();
@@ -78,15 +89,20 @@ public class ClientService implements IClientService{
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     
-
+    /**
+     * Save a client
+     * @param client
+     * @return 
+     */
     @Override
-    @Transactional
+    @Transactional 
     public ResponseEntity<ClientResponseRest> saveClient(Client client) {
         //Declaro una variable del tipo ClientResponseRest
         ClientResponseRest response = new ClientResponseRest();
         List<Client>listClient = new ArrayList();
         
         try {
+            
             Client clientSave = clientDao.save(client);
             
             if (clientSave!=null) {
@@ -111,8 +127,14 @@ public class ClientService implements IClientService{
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * Update a client by id
+     * @param client
+     * @param id
+     * @return 
+     */
     @Override
-    @Transactional
+    @Transactional 
     public ResponseEntity<ClientResponseRest> updateClient(Client client, Long id){
          //Declaro una variable del tipo ClientResponseRest
         ClientResponseRest response = new ClientResponseRest();
@@ -153,10 +175,42 @@ public class ClientService implements IClientService{
     
     }
 
+    /**
+     * delete a client by id
+     * @param id
+     * @return 
+     */
     @Override
-    @Transactional
+    @Transactional 
     public ResponseEntity<ClientResponseRest> deleteClientById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         //Declaro una variable del tipo ClientResponseRest
+        ClientResponseRest response = new ClientResponseRest();
+        List<Client>listClient = new ArrayList();
+        
+        try {
+            Optional<Client> clientDelete = clientDao.findById(id);
+            
+            
+            if (clientDelete.isPresent()) {
+                
+                response.setMetadata("Respuesta ok", "00", "Cliente eliminado");
+                listClient.add(clientDelete.get());
+                response.getClientResponse().setListClient(listClient);
+                clientDao.deleteById(id);
+            }else {
+
+                response.setMetadata("Respuesta no ok", "-1", "Cliente no se pudo eliminar");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+            }
+            
+        } catch (Exception e) {
+            response.setMetadata("Respuesta no Ok", "-1", "Error al intentar eliminar cliente");
+            e.getStackTrace();
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
 }
