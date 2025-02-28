@@ -10,12 +10,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author Emilio Mayer
  */
+@Service
 public class ProductService implements IProductService {
 
     @Autowired
@@ -91,11 +93,12 @@ public class ProductService implements IProductService {
     public ResponseEntity<ProductResponseRest> saveProduct(Product product) {
         ProductResponseRest response = new ProductResponseRest();
         List<Product> listProduct = new ArrayList();
-
+        //List<Sale> listSale = new ArrayList();
+        //listSale.add(new Sale());
+        //product.setListSale(listSale);
         try {
             Product productToSave = productDao.save(product);
             if (productToSave != null) {
-
                 listProduct.add(productToSave);
                 response.setMetadata("Respuesta ok", "00", "Producto guardado exitosamente");
                 response.getProductResponse().setListProduct(listProduct);
@@ -134,7 +137,7 @@ public class ProductService implements IProductService {
                 productToUpdate.get().setBrand(product.getBrand());
                 productToUpdate.get().setCost(product.getCost());
                 productToUpdate.get().setStockAvailable(product.getStockAvailable());
-                productToUpdate.get().setListSale(product.getListSale());
+                //productToUpdate.get().setListSale(product.getListSale());
 
                 Product productUp = productDao.save(productToUpdate.get());
 

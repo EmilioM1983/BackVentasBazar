@@ -186,22 +186,19 @@ public class ClientService implements IClientService{
          //Declaro una variable del tipo ClientResponseRest
         ClientResponseRest response = new ClientResponseRest();
         List<Client>listClient = new ArrayList();
+        Optional<Client> clientDelete = clientDao.findById(id);
         
         try {
-            Optional<Client> clientDelete = clientDao.findById(id);
-            
-            
+                     
             if (clientDelete.isPresent()) {
                 
-                response.setMetadata("Respuesta ok", "00", "Cliente eliminado");
+                
                 listClient.add(clientDelete.get());
                 response.getClientResponse().setListClient(listClient);
                 clientDao.deleteById(id);
-            }else {
-
-                response.setMetadata("Respuesta no ok", "-1", "Cliente no se pudo eliminar");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
+                
+                response.setMetadata("Respuesta ok", "00", "Cliente eliminado");
+            
             }
             
         } catch (Exception e) {

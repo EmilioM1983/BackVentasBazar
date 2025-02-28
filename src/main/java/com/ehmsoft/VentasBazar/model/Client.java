@@ -1,5 +1,6 @@
 package com.ehmsoft.VentasBazar.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,5 +28,6 @@ public class Client {
     private String email;
     private String phone;
     @OneToMany(mappedBy = "client")
+    @JsonIgnore
     private List<Sale> listSale;
 }

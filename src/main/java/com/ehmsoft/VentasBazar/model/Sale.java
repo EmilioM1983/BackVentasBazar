@@ -13,11 +13,13 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Emilio Mayer
  */
+@NoArgsConstructor
 @Entity
 @Data
 @Table(name = "sale")
