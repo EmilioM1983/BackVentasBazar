@@ -13,19 +13,19 @@ public interface ISaleService {
      * Service search all Sale
      * @return 
      */
-    public ResponseEntity<SaleResponseRest> searchClient();
+    public ResponseEntity<SaleResponseRest> searchSales();
     
     /**
      * service search sale by id
      * @param id
      * @return 
      */
-    public ResponseEntity<SaleResponseRest> searchClientById(Long id);
+    public ResponseEntity<SaleResponseRest> searchSaleById(Long id);
     
     /**
      * Service save sale
      * @param sale
      * @return 
      */
-    public ResponseEntity<SaleResponseRest> saveClient(Sale sale);
+    public ResponseEntity<SaleResponseRest> saveSale(Sale sale);
 }

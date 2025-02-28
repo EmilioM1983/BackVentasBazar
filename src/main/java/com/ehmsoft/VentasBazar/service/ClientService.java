@@ -69,11 +69,11 @@ public class ClientService implements IClientService{
         
         
         try {
-            Optional<Client> clientFonud = clientDao.findById(id);
+            Optional<Client> clientFound = clientDao.findById(id);
             
-            if (clientFonud.isPresent()) {
+            if (clientFound.isPresent()) {
                 response.setMetadata("Respoesta ok", "00", "Cliente encontrado");
-                listClient.add(clientFonud.get());
+                listClient.add(clientFound.get());
                 response.getClientResponse().setListClient(listClient);
             }else {
 
@@ -119,7 +119,7 @@ public class ClientService implements IClientService{
             }
             
         } catch (Exception e) {
-            response.setMetadata("Respuesta no Ok", "-1", "Error al intentar guaradar cliente");
+            response.setMetadata("Respuesta no Ok", "-1", "Error al consultar cliente");
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }

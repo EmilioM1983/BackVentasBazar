@@ -31,8 +31,5 @@ public class Product {
     @ManyToMany(mappedBy = "listProduct")
     @JsonIgnore
     private List<Sale> listSale;
-
-    public Product() {
-    }
-    
+  
 }
