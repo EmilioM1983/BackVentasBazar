@@ -30,8 +30,8 @@ public class Sale {
     private Double total;
     @ManyToMany
     @JoinTable(name = "rel_product_sale", 
-                joinColumns= @JoinColumn(name="FK_product", nullable= false),
-                inverseJoinColumns= @JoinColumn(name="FK_sale", nullable= false)
+                joinColumns= @JoinColumn(name="FK_sale", nullable= false),
+                inverseJoinColumns= @JoinColumn(name="FK_product", nullable= false)
             )
     private List<Product> listProduct;
     @ManyToOne

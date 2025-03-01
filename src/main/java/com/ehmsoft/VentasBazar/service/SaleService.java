@@ -1,5 +1,6 @@
 package com.ehmsoft.VentasBazar.service;
 
+import com.ehmsoft.VentasBazar.dao.IClientDao;
 import com.ehmsoft.VentasBazar.dao.IProductDao;
 import com.ehmsoft.VentasBazar.dao.ISaleDao;
 import com.ehmsoft.VentasBazar.dto.ProductDto;
@@ -29,6 +30,8 @@ public class SaleService implements ISaleService {
     private ISaleDao saleDao;
     @Autowired
     private IProductDao productDao;
+    @Autowired
+    private IClientDao clientDao;
 
     /**
      * search all products
@@ -97,45 +100,44 @@ public class SaleService implements ISaleService {
     @Override
     @Transactional
     public ResponseEntity<SaleResponseRest> saveSale(SaleRequestDto saleDto) {
-        
-        List<Product> listproducts = new ArrayList<>();
-        for (ProductDto dto : saleDto.getListProductDto()) {
-            Product product = productDao.findById(dto.getId_product())
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            listproducts.add(product);
-        }
 
+        double total = 0;
+        SaleResponseRest response = new SaleResponseRest();
+        List<Product> listProducts = new ArrayList<>();
+        List<Sale> listSale = new ArrayList();
         Sale sale = new Sale();
 
         if (sale.getClient() == null) {
             sale.setClient(new Client()); // Asegúrate de que el cliente esté inicializado
         }
 
-        sale.getClient().setIdClient(saleDto.getClienteDto().getId_cliente());
-        sale.setSaleDate(saleDto.getDate());
-        sale.setListProduct(listproducts);
-
-        SaleResponseRest response = new SaleResponseRest();
-        List<Sale> listSale = new ArrayList();
-
         try {
+            // Buscar el cliente en la BD
+            Client client = clientDao.findById(saleDto.getClienteDto().getId_cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-            double total = 0;
+            // Procesar productos
+            for (ProductDto dto : saleDto.getListProductDto()) {
+                Product product = productDao.findById(dto.getId_product())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-            // Validar si hay productos en la venta
-            if (sale.getListProduct() != null) {
-                for (Product product : sale.getListProduct()) {
-                    // Verificar si hay suficiente stock
-                    if (product.getStockAvailable() <= 0) {
-                        response.setMetadata("Respuesta no ok", "-1",
+                // Verificar stock suficiente
+                if (product.getStockAvailable() < 1) {
+                    response.setMetadata("Respuesta no ok", "-1",
                                 "No hay stock suficiente para el producto: " + product.getName());
                         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-                    }
-
-                    total += product.getCost(); // Sumar al total de la venta
-                    product.setStockAvailable(product.getStockAvailable() - 1); // Descontar stock
                 }
+
+                product.setStockAvailable(product.getStockAvailable() - 1);
+                listProducts.add(product);
+                total += product.getCost();
             }
+
+            sale.getClient().setIdClient(saleDto.getClienteDto().getId_cliente());
+            sale.setSaleDate(saleDto.getDate());
+            sale.setListProduct(listProducts);
+
+            
 
             // Asignar total de la venta
             sale.setTotal(total);
@@ -150,7 +152,7 @@ public class SaleService implements ISaleService {
                     Product productFromDB = productDao.findById(product.getId_product()).orElse(null);
 
                     if (productFromDB != null) {
-                       
+
                         productDao.save(productFromDB); // Guardamos el producto con el nuevo stock
                     } else {
                         // Si no encontramos el producto en la base de datos, podemos manejar el error
