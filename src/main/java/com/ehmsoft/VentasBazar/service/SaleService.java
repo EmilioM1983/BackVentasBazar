@@ -2,6 +2,9 @@ package com.ehmsoft.VentasBazar.service;
 
 import com.ehmsoft.VentasBazar.dao.IProductDao;
 import com.ehmsoft.VentasBazar.dao.ISaleDao;
+import com.ehmsoft.VentasBazar.dto.ProductDto;
+import com.ehmsoft.VentasBazar.dto.SaleRequestDto;
+import com.ehmsoft.VentasBazar.model.Client;
 import com.ehmsoft.VentasBazar.model.Product;
 import com.ehmsoft.VentasBazar.model.Sale;
 import com.ehmsoft.VentasBazar.responseDto.SaleResponseRest;
@@ -93,7 +96,25 @@ public class SaleService implements ISaleService {
      */
     @Override
     @Transactional
-    public ResponseEntity<SaleResponseRest> saveSale(Sale sale) {
+    public ResponseEntity<SaleResponseRest> saveSale(SaleRequestDto saleDto) {
+        
+        List<Product> listproducts = new ArrayList<>();
+        for (ProductDto dto : saleDto.getListProductDto()) {
+            Product product = productDao.findById(dto.getId_product())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            listproducts.add(product);
+        }
+
+        Sale sale = new Sale();
+
+        if (sale.getClient() == null) {
+            sale.setClient(new Client()); // Asegúrate de que el cliente esté inicializado
+        }
+
+        sale.getClient().setIdClient(saleDto.getClienteDto().getId_cliente());
+        sale.setSaleDate(saleDto.getDate());
+        sale.setListProduct(listproducts);
+
         SaleResponseRest response = new SaleResponseRest();
         List<Sale> listSale = new ArrayList();
 
@@ -129,8 +150,7 @@ public class SaleService implements ISaleService {
                     Product productFromDB = productDao.findById(product.getId_product()).orElse(null);
 
                     if (productFromDB != null) {
-                        // Descontamos la cantidad vendida al stock disponible
-                        productFromDB.setStockAvailable(productFromDB.getStockAvailable() - 1);
+                       
                         productDao.save(productFromDB); // Guardamos el producto con el nuevo stock
                     } else {
                         // Si no encontramos el producto en la base de datos, podemos manejar el error

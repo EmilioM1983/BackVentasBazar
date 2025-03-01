@@ -1,6 +1,7 @@
 
 package com.ehmsoft.VentasBazar.controller;
 
+import com.ehmsoft.VentasBazar.dto.SaleRequestDto;
 import com.ehmsoft.VentasBazar.model.Sale;
 import com.ehmsoft.VentasBazar.responseDto.SaleResponseRest;
 import com.ehmsoft.VentasBazar.service.ISaleService;
@@ -39,7 +40,7 @@ public class SaleRestController {
     }
     
     @PostMapping("/sale")
-    public ResponseEntity<SaleResponseRest> saveSale(@RequestBody Sale sale){
-        return saleService.saveSale(sale);
+    public ResponseEntity<SaleResponseRest> saveSale(@RequestBody SaleRequestDto saleDto){
+        return saleService.saveSale(saleDto);
     }
 }

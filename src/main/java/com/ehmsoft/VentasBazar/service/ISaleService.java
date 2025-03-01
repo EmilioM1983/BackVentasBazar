@@ -1,5 +1,6 @@
 package com.ehmsoft.VentasBazar.service;
 
+import com.ehmsoft.VentasBazar.dto.SaleRequestDto;
 import com.ehmsoft.VentasBazar.model.Sale;
 import com.ehmsoft.VentasBazar.responseDto.SaleResponseRest;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,5 @@ public interface ISaleService {
      * @param sale
      * @return 
      */
-    public ResponseEntity<SaleResponseRest> saveSale(Sale sale);
+    public ResponseEntity<SaleResponseRest> saveSale(SaleRequestDto saleDto);
 }
