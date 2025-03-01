@@ -9,6 +9,7 @@ import com.ehmsoft.VentasBazar.model.Client;
 import com.ehmsoft.VentasBazar.model.Product;
 import com.ehmsoft.VentasBazar.model.Sale;
 import com.ehmsoft.VentasBazar.responseDto.SaleResponseRest;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -94,7 +95,7 @@ public class SaleService implements ISaleService {
     /**
      * Save a sale
      *
-     * @param sale
+     * @param saleDto
      * @return
      */
     @Override
@@ -107,72 +108,53 @@ public class SaleService implements ISaleService {
         List<Sale> listSale = new ArrayList();
         Sale sale = new Sale();
 
-        if (sale.getClient() == null) {
-            sale.setClient(new Client()); // Asegúrate de que el cliente esté inicializado
-        }
-
         try {
             // Buscar el cliente en la BD
             Client client = clientDao.findById(saleDto.getClienteDto().getId_cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                    .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
 
             // Procesar productos
             for (ProductDto dto : saleDto.getListProductDto()) {
                 Product product = productDao.findById(dto.getId_product())
-                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
 
                 // Verificar stock suficiente
                 if (product.getStockAvailable() < 1) {
                     response.setMetadata("Respuesta no ok", "-1",
-                                "No hay stock suficiente para el producto: " + product.getName());
-                        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                            "No hay stock suficiente para el producto: " + product.getName());
+                    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
                 }
 
+                // Actualizar stock y agregar a la lista
                 product.setStockAvailable(product.getStockAvailable() - 1);
                 listProducts.add(product);
                 total += product.getCost();
             }
 
-            sale.getClient().setIdClient(saleDto.getClienteDto().getId_cliente());
+            // Crear y guardar la venta
+            sale.setClient(client);
             sale.setSaleDate(saleDto.getDate());
             sale.setListProduct(listProducts);
-
-            
-
-            // Asignar total de la venta
             sale.setTotal(total);
 
-            // Guardar la venta en la base de datos
             Sale saleToSave = saleDao.save(sale);
 
-            // Actualizar los productos con el nuevo stock en la BD
+            // Guardar productos actualizados
+            productDao.saveAll(listProducts);
+
             if (saleToSave != null) {
-                for (Product product : sale.getListProduct()) {
-                    // Buscar el producto en la base de datos para actualizar el stock
-                    Product productFromDB = productDao.findById(product.getId_product()).orElse(null);
-
-                    if (productFromDB != null) {
-
-                        productDao.save(productFromDB); // Guardamos el producto con el nuevo stock
-                    } else {
-                        // Si no encontramos el producto en la base de datos, podemos manejar el error
-                        response.setMetadata("Respuesta no ok", "-1", "Producto no encontrado: " + product.getName());
-                        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-                    }
-                }
-
-                listSale.add(saleToSave);
                 response.setMetadata("Respuesta ok", "00", "Venta registrada exitosamente");
+                response.getSaleResponse().setListSale(listSale);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                response.setMetadata("Respuesta no ok", "-1", "Venta no registrada");
+                response.setMetadata("Respuesta no ok", "-1", "Error al intentar guardar venta");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
+
         } catch (Exception e) {
             response.setMetadata("Respuesta no Ok", "-1", "Error al consultar Venta");
             e.printStackTrace();  // Imprimir el stack trace para depuración
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
