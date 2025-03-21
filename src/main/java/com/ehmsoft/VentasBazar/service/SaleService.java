@@ -1,7 +1,6 @@
 package com.ehmsoft.VentasBazar.service;
 
 import com.ehmsoft.VentasBazar.dao.IClientDao;
-import com.ehmsoft.VentasBazar.dao.IProductDao;
 import com.ehmsoft.VentasBazar.dao.ISaleDao;
 import com.ehmsoft.VentasBazar.dto.ProductDto;
 import com.ehmsoft.VentasBazar.dto.SaleRequestDto;
@@ -18,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ehmsoft.VentasBazar.dao.IProductDao;
 
 /**
  * Service Sale

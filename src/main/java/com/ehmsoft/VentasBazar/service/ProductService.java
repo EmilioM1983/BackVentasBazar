@@ -1,6 +1,5 @@
 package com.ehmsoft.VentasBazar.service;
 
-import com.ehmsoft.VentasBazar.dao.IProductDao;
 import com.ehmsoft.VentasBazar.model.Product;
 import com.ehmsoft.VentasBazar.responseDto.ProductResponseRest;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ehmsoft.VentasBazar.dao.IProductDao;
 
 /**
  *
